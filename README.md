@@ -11,9 +11,11 @@ docker compose up
 ## Проверка запущенного приложения
 После запуска контейнеров для проверки корректной работы необходимо выполнить команду в терминале:
 ```bash
- curl -XGET https://localhost:9200 -u 'admin:admin' --insecure
+ curl -XGET https://localhost:9200 -u 'admin:<admin-password>' --insecure
 ```
-Запуск контейнеров прошел успешно, если в отет получен подобный json:
+_*Пароль - значение переменной ```OPENSEARCH_INITIAL_ADMIN_PASSWORD``` из файла **docker-compose.yml**_
+
+Запуск контейнеров прошел успешно, если в ответ получен подобный json:
 ```bash
 {
   "name" : "opensearch-node1",
