@@ -23,6 +23,7 @@ public class StudentController {
     public ResponseEntity<Student> createStudent(@RequestBody Student student) {
         try {
             Student createdStudent = studentService.createStudent(student);
+            log.info("Created student: " + student);
             return ResponseEntity.ok(createdStudent);
         } catch (IOException e) {
             log.error("Error creating student", e);
@@ -39,6 +40,7 @@ public class StudentController {
 
         try {
             Student updatedStudent = studentService.updateStudent(id, student);
+            log.info("Updated student: " + student);
             return ResponseEntity.ok(updatedStudent);
         } catch (IOException e) {
             log.error("Error updating student", e);
@@ -50,6 +52,7 @@ public class StudentController {
     public ResponseEntity<List<Student>> searchStudents(@RequestBody StudentSearchRequest searchRequest) {
         try {
             List<Student> students = studentService.searchStudents(searchRequest);
+            log.info("Found students: " + students);
             return ResponseEntity.ok(students);
         } catch (IOException e) {
             log.error("Error searching students", e);
