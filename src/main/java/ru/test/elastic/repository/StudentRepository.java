@@ -1,14 +1,10 @@
 package ru.test.elastic.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.stereotype.Repository;
 import ru.test.elastic.model.Student;
 
-import java.util.Optional;
+@Repository
+public interface StudentRepository extends ElasticsearchRepository<Student, Long> {
 
-public interface StudentRepository extends JpaRepository<Student, Long> {
-    Student save(Student student);
-
-    Optional<Student> findById(Long id);
-
-    void deleteById(Long id);
 }

@@ -6,11 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.test.elastic.model.Student;
-import ru.test.elastic.model.StudentSearchRequest;
 import ru.test.elastic.service.StudentService;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @Slf4j
@@ -48,15 +46,17 @@ public class StudentController {
         }
     }
 
-    @PostMapping("/search")
-    public ResponseEntity<List<Student>> searchStudents(@RequestBody StudentSearchRequest searchRequest) {
-        try {
-            List<Student> students = studentService.searchStudents(searchRequest);
-            log.info("Found students: " + students);
-            return ResponseEntity.ok(students);
-        } catch (IOException e) {
-            log.error("Error searching students", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<Student> getStudent(@PathVariable Long id) {
+        Student existingStudent = studentService.getStudent(id);
+        return existingStudent == null
+                ? ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+                : ResponseEntity.ok(existingStudent);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
+        studentService.deleteStudent(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

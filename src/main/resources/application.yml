@@ -1,22 +1,12 @@
 spring:
   application:
     name: elastic
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-  h2:
-    console:
-      enabled: true
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
 opensearch:
   host: localhost
   port: 9200
   scheme: http
   username: admin
   password: Random!Password1
-  truststore:
-    path: opensearch-truststore.jks
-    password: changeit
