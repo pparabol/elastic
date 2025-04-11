@@ -2,24 +2,24 @@ version: '2'
 
 services:
   app:
-    image: 'docker-spring-boot-postgres:latest'
+    image: 'elastic-app-image:latest'
     build:
       context: .
     container_name: elastic-app
     depends_on:
       - db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/elastic-db
+      - SPRING_DATASOURCE_USERNAME=elastic
+      - SPRING_DATASOURCE_PASSWORD=elastic
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
   db:
-    image: 'postgres:13.1-alpine'
+    image: 'postgres:14-alpine'
     container_name: db
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=elastic-db
+      - POSTGRES_USER=elastic
+      - POSTGRES_PASSWORD=elastic
