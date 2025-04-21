@@ -1,9 +1,9 @@
 package ru.test.elastic.repository;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.test.elastic.model.Student;
 
@@ -11,24 +11,31 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
-import static ru.test.elastic.TestConstants.*;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = NONE)
 public class StudentRepositoryTest {
 
     @Autowired
     private StudentRepository studentRepository;
 
+    private Student student;
+
+    @BeforeEach
+    public void setUp() {
+        student = Student.builder()
+                .name("name")
+                .email("email")
+                .build();;
+    }
+
     @AfterEach
     public void tearDown() {
-        studentRepository.delete(TEST_STUDENT);
+        studentRepository.delete(student);
     }
 
     @Test
     public void save() {
-        Student savedStudent = studentRepository.save(TEST_STUDENT);
+        Student savedStudent = studentRepository.save(student);
 
         assertThat(savedStudent).isNotNull();
         assertThat(savedStudent.getId()).isGreaterThan(0);
@@ -36,7 +43,7 @@ public class StudentRepositoryTest {
 
     @Test
     public void findById() {
-        Student savedStudent = studentRepository.save(TEST_STUDENT);
+        Student savedStudent = studentRepository.save(student);
 
         Optional<Student> studentById = studentRepository.findById(savedStudent.getId());
 
@@ -49,7 +56,7 @@ public class StudentRepositoryTest {
 
     @Test
     public void findAll() {
-        studentRepository.save(TEST_STUDENT);
+        studentRepository.save(student);
 
         List<Student> students = studentRepository.findAll();
 
@@ -59,7 +66,7 @@ public class StudentRepositoryTest {
 
     @Test
     public void deleteById() {
-        Student savedStudent = studentRepository.save(TEST_STUDENT);
+        Student savedStudent = studentRepository.save(student);
 
         studentRepository.deleteById(savedStudent.getId());
         Optional<Student> studentById = studentRepository.findById(savedStudent.getId());
