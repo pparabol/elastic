@@ -25,7 +25,7 @@ public class StudentRepositoryTest {
         student = Student.builder()
                 .name("name")
                 .email("email")
-                .build();;
+                .build();
     }
 
     @AfterEach
