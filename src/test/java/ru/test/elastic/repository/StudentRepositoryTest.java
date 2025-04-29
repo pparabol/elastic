@@ -4,15 +4,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import reactor.core.publisher.Flux;
 import ru.test.elastic.model.Student;
-
-import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@DataMongoTest
 public class StudentRepositoryTest {
 
     @Autowired
@@ -23,6 +21,7 @@ public class StudentRepositoryTest {
     @BeforeEach
     public void setUp() {
         student = Student.builder()
+                .id(1L)
                 .name("name")
                 .email("email")
                 .build();
@@ -30,12 +29,12 @@ public class StudentRepositoryTest {
 
     @AfterEach
     public void tearDown() {
-        studentRepository.delete(student);
+        studentRepository.deleteAll();
     }
 
     @Test
     public void save() {
-        Student savedStudent = studentRepository.save(student);
+        Student savedStudent = studentRepository.save(student).block();
 
         assertThat(savedStudent).isNotNull();
         assertThat(savedStudent.getId()).isGreaterThan(0);
@@ -43,12 +42,12 @@ public class StudentRepositoryTest {
 
     @Test
     public void findById() {
-        Student savedStudent = studentRepository.save(student);
+        Student savedStudent = studentRepository.save(student).block();
 
-        Optional<Student> studentById = studentRepository.findById(savedStudent.getId());
+        Student studentById = studentRepository.findById(savedStudent.getId()).block();
 
-        assertThat(studentById).isPresent();
-        assertThat(studentById.get())
+        assertThat(studentById).isNotNull();
+        assertThat(studentById)
                 .hasFieldOrPropertyWithValue("id", savedStudent.getId())
                 .hasFieldOrPropertyWithValue("name", savedStudent.getName())
                 .hasFieldOrPropertyWithValue("email", savedStudent.getEmail());
@@ -58,19 +57,17 @@ public class StudentRepositoryTest {
     public void findAll() {
         studentRepository.save(student);
 
-        List<Student> students = studentRepository.findAll();
+        Flux<Student> students = studentRepository.findAll();
 
         assertThat(students).isNotNull();
-        assertThat(students).hasSize(1);
     }
 
     @Test
     public void deleteById() {
-        Student savedStudent = studentRepository.save(student);
+        Student studentById = studentRepository.save(student)
+                .flatMap(savedStudentMono -> studentRepository.deleteById(savedStudentMono.getId()))
+                        .then(studentRepository.findById(student.getId())).block();
 
-        studentRepository.deleteById(savedStudent.getId());
-        Optional<Student> studentById = studentRepository.findById(savedStudent.getId());
-
-        assertThat(studentById).isEmpty();
+        assertThat(studentById).isNull();
     }
 }

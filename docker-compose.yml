@@ -1,25 +1,24 @@
 version: '2'
 
 services:
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
   app:
     image: 'elastic-app-image:latest'
     build:
       context: .
     container_name: elastic-app
     depends_on:
-      - db
+      - mongodb
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/elastic-db
-      - SPRING_DATASOURCE_USERNAME=elastic
-      - SPRING_DATASOURCE_PASSWORD=elastic
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: testdb
 
-  db:
-    image: 'postgres:14-alpine'
-    container_name: db
-    ports:
-      - "6541:5432"
-    environment:
-      - POSTGRES_DB=elastic-db
-      - POSTGRES_USER=elastic
-      - POSTGRES_PASSWORD=elastic
+volumes:
+  mongo_data:

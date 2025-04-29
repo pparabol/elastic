@@ -3,13 +3,13 @@ package ru.test.elastic.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.test.elastic.exception.NotFoundException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.test.elastic.model.Student;
 import ru.test.elastic.repository.StudentRepository;
 
-import java.io.IOException;
-
 import static java.lang.String.format;
+import static reactor.core.publisher.Mono.just;
 
 @Service
 @RequiredArgsConstructor
@@ -17,29 +17,31 @@ import static java.lang.String.format;
 public class StudentService {
     private final StudentRepository studentRepository;
 
-    public Student createStudent(Student student) {
+    public Mono<Student> createStudent(Student student) {
         log.info("Save student: " + student);
         return studentRepository.save(student);
     }
 
-    public Student updateStudent(Long id, Student student) {
+    public Mono<Student> updateStudent(Long id, Student student) {
         log.info(format("Update student by id %d: %s", id, student));
-        Student savedStudent = getStudent(id);
-        savedStudent.setName(student.getName());
-        savedStudent.setEmail(student.getEmail());
-
-        return studentRepository.save(student);
+        return just(student).flatMap(st -> {
+            st.setId(id);
+            return studentRepository.save(student);
+        });
     }
 
-    public Student getStudent(Long id) {
+    public Mono<Student> getStudent(Long id) {
         log.info("Get student by id " + id);
-        return studentRepository.findById(id)
-                .orElseThrow(NotFoundException::new);
+        return studentRepository.findById(id);
     }
 
-    public void deleteStudent(Long id) {
+    public Flux<Student> getStudents() {
+        log.info("Get all students");
+        return studentRepository.findAll();
+    }
+
+    public Mono<Void> deleteStudent(Long id) {
         log.info("Delete student by id " + id);
-        getStudent(id);
-        studentRepository.deleteById(id);
+        return studentRepository.deleteById(id);
     }
 }
